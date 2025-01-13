@@ -117,4 +117,13 @@ describe('implicit lib definitions', () => {
     expect(symbolVariables).toHaveLength(1);
     expect(symbolVariables[0]).toBeInstanceOf(ImplicitLibVariable);
   });
+
+  it('should throw if passed an unrecognized lib name', () => {
+    expect(() => {
+      parseAndAnalyze('var f = (a: Symbol) => a;', {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        lib: ['invalid+lib' as any],
+      });
+    }).toThrow('invalid+lib');
+  });
 });

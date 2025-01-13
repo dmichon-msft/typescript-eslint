@@ -53,7 +53,7 @@ class Referencer extends Visitor {
   private populateGlobalsFromLib(globalScope: GlobalScope): void {
     for (const lib of this.#lib) {
       const variables = TSLibraries.get(lib);
-      /* istanbul ignore if */ if (!variables) {
+      if (!variables) {
         throw new Error(`Invalid value for lib provided: ${lib}`);
       }
       for (const [name, variable] of variables) {
