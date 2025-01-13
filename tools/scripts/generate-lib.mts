@@ -266,19 +266,29 @@ async function main(): Promise<void> {
 
   // generate and write a barrel file
   const barrelImports = []; // use a separate way so everything is in the same order
-  const barrelCode = ['', `const lib = {`];
+  const barrelCode = [
+    '',
+    `const lib: ReadonlyMap<string, [string, ImplicitLibVariableOptions][]> =`,
+    `new Map<string, [string, ImplicitLibVariableOptions][]>(Object.entries({`,
+  ];
+  // Call `Object.entries` during barrel construction to avoid redundantly calling
+  // and allocating a new array on every reference
   for (const lib of libMap.keys()) {
     const name = sanitize(lib);
     if (name === 'lib') {
       barrelImports.push(`import { lib as libBase } from './${lib}'`);
-      barrelCode.push(`'${lib}': libBase,`);
+      barrelCode.push(`'${lib}': Object.entries(libBase),`);
     } else {
       barrelImports.push(`import { ${name} } from './${lib}'`);
-      barrelCode.push(lib === name ? `${lib},` : `'${lib}': ${name},`);
+      barrelCode.push(`'${lib}': Object.entries(${name}),`);
     }
   }
   barrelCode.unshift(...barrelImports);
-  barrelCode.push('} as const;');
+  barrelCode.unshift(
+    '',
+    `import type { ImplicitLibVariableOptions } from '../variable';`,
+  );
+  barrelCode.push('}));');
 
   barrelCode.push('', 'export { lib };');
 

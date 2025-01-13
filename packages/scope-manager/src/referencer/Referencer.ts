@@ -52,12 +52,11 @@ class Referencer extends Visitor {
 
   private populateGlobalsFromLib(globalScope: GlobalScope): void {
     for (const lib of this.#lib) {
-      const variables = TSLibraries[lib];
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const variables = TSLibraries.get(lib);
       /* istanbul ignore if */ if (!variables) {
         throw new Error(`Invalid value for lib provided: ${lib}`);
       }
-      for (const [name, variable] of Object.entries(variables)) {
+      for (const [name, variable] of variables) {
         globalScope.defineImplicitVariable(name, variable);
       }
     }
